@@ -13,6 +13,10 @@
     "axios": "^1.4.0",
     "csv-writer": "^1.6.0",
     "fast-csv": "^4.3.6",
-    "nodemon": "^2.0.22"
+    "nodemon": "^2.0.22",
+    "pg": "^8.11.1"
+  },
+  "devDependencies": {
+    "eslint": "^8.44.0"
   }
 }

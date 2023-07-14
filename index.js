@@ -14,8 +14,21 @@ const csvWriter = createCsvWriter({
   ]
 })
 
+const { Client } = require('pg')
+const client = new Client({
+  user: 'postgres',
+  host: 'localhost',
+  database: 'some2some',
+  password: 'postgres',
+  port: 5432,
+})
+client.connect(function(err) {
+  if (err) throw err;
+  console.log("Connected!");
+});
+
 const url = 'https://graph.facebook.com/v17.0/';
-const access_token = 'EAADg4X8ZAH5QBAMdeLJsOOTtSyOBg4mpaxZCJAK2JhVHdx3keIPo0R8am5XGwKnq9jYaXEWWDestJDpnckxw8tl2CsP8D9MJToJQISrMKO0vovUSj5opV2Itf95IYbA0swP4UgZCFVrA17RZClEzkyuNg1hZC1JVTXq3IYn6o3qkZBCLZBEqsKK87fMLZAGKZCogORsJxWMDk8CPGyfcqu5W1';
+const access_token = 'EAADg4X8ZAH5QBADtCmHQb9jrHURmB6iXhkd8ZC59zZCVx8EAAcdemMHLQeJygDtZAlOXY8bX0Ommttr6ZBIoe9LBbJZCxPHUCGKZBZCv6TtgcbqE7ZBoolSKeLJhcwJB1IKLMSbTF4cMCk5v9oJwveAmxUwwBZBlOBoZBIuKiBZAFDszbM6PKUgVqhYq8wRjSXJzKHK921dR8syMmhANJ78JKeZAy';
 const picture = '/attachments?access_token=';
 var dataArr = [];
 csv.parseFile("instagram.csv", {headers: true})
@@ -24,6 +37,8 @@ csv.parseFile("instagram.csv", {headers: true})
 
 }
 )
+
+const findTitle = `SELECT * FROM product_list where content = $1`;
 
 
 function processContent(row){
@@ -37,14 +52,16 @@ function processContent(row){
     const price = getPrice(content);
     const size = getSize(content);
     const createDate = row.CreateDate;
-
-
-    dataArr.push({id:row.No, content:content, title: title,price:price, picture:picture, size: size, createDate: createDate});
-    console.log(dataArr.length);
-    if(dataArr.length>= 22){
-      csvWriter.writeRecords(dataArr);
-      console.log('end'); 
+    client.query(findTitle, [title], (err, res)=> {
+      console.log(res.rows);
+      if(res.rows.length ==0){
+      dataArr.push({id:row.No, content:content, title: title,price:price, picture:picture, size: size, createDate: createDate});
+      if(dataArr.length>= 22){
+        csvWriter.writeRecords(dataArr);
+        console.log('end'); 
+      }
     }
+    });
 })
 }
 
